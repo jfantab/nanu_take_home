@@ -29,7 +29,7 @@ The initial read of all the calendar logs from the DB does take some time but on
 
 The calendar logs can be retrieved on a day-to-day basis instead of for the whole month at once. In addition, another feature that can be added is the editing or writing of logs via a text input box.
 
-Currently, the client settings are stored locally. One improvement is to store them in the database so that the settings can be saved. Likewise, the app needs to be able to read the settings from the database too. One idea I have of storing the nested tree in Firebase Firestore is in a flat tree structure, where each setting takes the following format, akin to an adjacency list: 
+One improvement is to store them in the cloud so that the settings can be saved. Likewise, the app needs to be able to read the settings from the database in the cloud too. One idea I have of storing the nested tree in Firebase Firestore is in a flat tree structure, where each setting takes the following format, akin to an adjacency list: 
 
 ```
 {
@@ -41,5 +41,4 @@ Currently, the client settings are stored locally. One improvement is to store t
 
 Another idea I had was to store the document references instead of just the children names. This would allow direct access rather than having to search linearly through all the documents to find each child.
 
-Likewise, reads and writes of the settings to the DB can also be optimized. One method is to write to the DB one record at a time as each one is checked or updated in the UI.
-
+Finally, it is important to consider the scalability, availability, and performance of the app. Balancing bandwidth, compute power, and cost is a key tradeoff——higher processing capacity and greater bandwidth can improve performance but will increase the costs. As the user base grows, the cloud backend must be capable of handling an increasing volume of requests while maintaining low latency. The app should deliver fast, responsive interactions to deliver a positive user experience.
