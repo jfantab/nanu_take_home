@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Node from './client_element.js';
 
+import AntDesign from 'react-native-vector-icons/AntDesign';
+
 import { data } from '../util/constants.js';
 import {
     edit,
@@ -58,7 +60,14 @@ function ClientBox({ clientInfo, active, handleSetActive }) {
     return (
         <View style={styles.container}>
             <TouchableOpacity onPress={handleOnPress}>
-                <Text style={styles.text}>{clientInfo.name}</Text>
+                <Text style={styles.text}>
+                    {active == clientInfo.id ? (
+                        <AntDesign name="arrowdown" size={27} />
+                    ) : (
+                        <AntDesign name="arrowright" size={27} />
+                    )}{' '}
+                    {clientInfo.name}
+                </Text>
             </TouchableOpacity>
             {active && active == clientInfo.id && (
                 <Node

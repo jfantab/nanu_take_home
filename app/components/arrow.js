@@ -1,8 +1,4 @@
-import { useEffect, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import CheckBox from 'expo-checkbox';
-
-import { updateDescendants } from '../util/recurse';
+import { TouchableOpacity } from 'react-native';
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
