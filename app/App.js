@@ -10,14 +10,16 @@ import MyCalendar from './screens/calendar.js';
 import {
     populateSampleLogs,
     populateSettings,
+    populateBookings,
 } from './my_firebase/firestore_db.js';
 import { edit } from './util/recurse.js';
-import { data, clients } from './util/constants.js';
+import { data, clients, sampleAppts } from './util/constants.js';
 
 const Tab = createBottomTabNavigator();
 
 export default function App() {
     useEffect(() => {
+        // populateBookings(sampleAppts);
         // populateSampleLogs();
         // const tree = edit(data);
         // populateSettings(tree, clients)

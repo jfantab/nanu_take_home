@@ -1,12 +1,13 @@
 import {
     collection,
     addDoc,
+    updateDoc,
     query,
     getDocs,
     where,
     Timestamp,
 } from 'firebase/firestore';
-import { db, doc, setDoc, updateDoc } from './firebase.js';
+import { db, doc } from './firebase.js';
 
 import { clients, data } from '../util/constants.js';
 import { logs } from '../util/logs.js';
@@ -128,6 +129,7 @@ export const populateSampleLogs = async () => {
 
         for (let log of logsGMT7) {
             const docRef = await addDoc(collection(db, 'logs'), {
+                // id: log.id,
                 date: Timestamp.fromDate(new Date(log.date)),
                 text: log.text,
             });
@@ -172,5 +174,99 @@ export const querySampleLogs = async (date) => {
         return logs;
     } catch (e) {
         console.error('Error retrieving logs: ', e);
+    }
+};
+
+/* Bookings */
+
+export const readBookings = async (date) => {
+    try {
+        const { start, end } = getUTCDateRange(date);
+        const startTime = Timestamp.fromDate(start);
+        const endTime = Timestamp.fromDate(end);
+
+        const bookingsRef = collection(db, 'bookings');
+
+        const q = query(
+            bookingsRef,
+            where('date', '>=', startTime),
+            where('date', '<=', endTime)
+        );
+        const querySnapshot = await getDocs(q);
+
+        const bookings = [];
+        querySnapshot.forEach((doc) => {
+            let curDoc = doc.data();
+            let obj = {
+                id: curDoc.id,
+                date: curDoc.date.toDate(),
+                name: curDoc.name,
+                client: curDoc.client,
+                service: curDoc.service,
+                clientEmail: curDoc.clientEmail,
+            };
+            bookings.push(obj);
+        });
+
+        bookings.sort((a, b) => {
+            const dateA = a.date;
+            const dateB = b.date;
+
+            // Get time in minutes since midnight
+            const timeA = dateA.getHours() * 60 + dateA.getMinutes();
+            const timeB = dateB.getHours() * 60 + dateB.getMinutes();
+
+            return timeA - timeB;
+        });
+
+        return bookings;
+    } catch (e) {
+        console.error('Error reading bookings: ', e);
+    }
+};
+
+export const populateBookings = async (bookings) => {
+    try {
+        const bookingsGMT7 = bookings.map((booking) => {
+            const dateObj = new Date(booking.date);
+            // Add 7 hours in milliseconds
+            const gmt7Time = new Date(dateObj.getTime() + 7 * 60 * 60 * 1000);
+            // Return in ISO format (still with 'Z' removed for local time feel)
+            return {
+                ...booking,
+                date: gmt7Time.toISOString().replace('Z', '+07:00'),
+            };
+        });
+
+        for (let booking of bookingsGMT7) {
+            const docRef = await addDoc(collection(db, 'bookings'), {
+                ...booking,
+                date: Timestamp.fromDate(new Date(booking.date)),
+            });
+            console.log('Doc added: ', docRef.id);
+        }
+    } catch (e) {
+        console.error('Error adding doc: ', e);
+    }
+};
+
+export const addBooking = async (appt) => {
+    try {
+        console.log('Adding booking for: ', appt);
+        const q = query(
+            collection(db, `bookings`),
+            where('date', '==', appt.date)
+        );
+
+        const querySnapshot = await getDocs(q);
+        const doc = querySnapshot.docs[0];
+        const docRef = await updateDoc(doc.ref, {
+            client: appt.client,
+            clientEmail: appt.clientEmail,
+            service: appt.service,
+        });
+        console.log('Updated doc with ID: ', docRef);
+    } catch (e) {
+        console.error('Error adding bookings: ', e);
     }
 };
